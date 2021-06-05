@@ -40,7 +40,7 @@ const world = {
   ground: 253,
 }
 
-//Dinosaur
+//////////Dinosaur
 class Dino {
   constructor(){
     this.x = 3 ;
@@ -68,6 +68,7 @@ class Dino {
     ctx.fill();
   }
   update(){
+    console.log(this.jumpPower);
     if (keyboard.space && this.onGround) { this.dy = this.jumpPower }
     if(this.collided){
       this.blood.bloodContainerWidth -= 2;
@@ -88,6 +89,8 @@ class Dino {
     }
 }
 }
+//////////
+/////////Cactus
 class Cactus {
   constructor(){
     this.x = CANVAS_WIDTH ;
@@ -103,15 +106,16 @@ class Cactus {
     ctx.stroke();
   }
   update(){
+    console.log(this.moveSpeed);
     this.dx = this.moveSpeed
     this.dx *= world.drag;
     this.x += this.dx;
   }
 }
-
-const dino = new Dino();
-const cactus1 = new Cactus();
-const cactus2 = new Cactus();
+//////////
+var dino = new Dino();
+var cactus1 = new Cactus();
+var cactus2 = new Cactus();
 var cactusArray = [];
 cactusArray.push(cactus1);
 cactusArray.push(cactus2);
@@ -119,6 +123,8 @@ cactusArray.push(cactus2);
 var showI = true;
 //game state
 var gameOver = false;
+// var resetClick = false;
+// var requestId = 0;
 //game over and reset image
 const gameOverImg = new Image();
 const reset = new Image();
@@ -150,6 +156,24 @@ reset.src = './Other/Reset.png';
 //     // ctx.drawImage(reset, 262, 100, 75, 101);
 //   }
 // }
+canvas.addEventListener('click', function(e){
+  if(gameOver){
+    if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
+      dino = new Dino();
+      cactus1 = new Cactus();
+      cactus2 = new Cactus();
+      cactusArray = [];
+      cactusArray.push(cactus1);
+      cactusArray.push(cactus2);
+      showI = true;
+      gameOver = false;
+      resetClick = false;
+      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
+      animate();
+    }
+  }
+})
+
 function animate(){
   if(showI){
     if(keyboard.any){ // don't understand this line
@@ -169,7 +193,7 @@ function animate(){
      ctx.drawImage(gameOverImg, 107, 50, 386, 40);
      ctx.drawImage(reset, 262, 100, 75, 101);
    }
-  else{
+  if(!showI && !gameOver){
     ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     dino.update();
     dino.draw();
