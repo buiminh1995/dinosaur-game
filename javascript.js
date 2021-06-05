@@ -40,7 +40,7 @@ const world = {
   ground: 253,
 }
 
-//////////Dinosaur
+//////////Dinosaur class
 class Dino {
   constructor(){
     this.x = 3 ;
@@ -54,26 +54,24 @@ class Dino {
     this.height = 60;
     this.collided = false;
     this.blood = {
-      bloodContainerX: 10,
-      bloodContainerY: 10,
-      bloodContainerWidth: 50,
-      bloodContainerHeight: 10,
+      x: 10,
+      y: 10,
+      Width: 50,
+      Height: 10,
     }
   }
   draw(){
     ctx.beginPath();
-    //ctx.rect(this.blood.X, this.blood.Y , this.blood.bloodWidth, this.blood.bloodHeight);
     ctx.rect(this.x, this.y , this.width, this.height);
-    ctx.rect(this.blood.bloodContainerX, this.blood.bloodContainerY , this.blood.bloodContainerWidth, this.blood.bloodContainerHeight);
+    ctx.rect(this.blood.x, this.blood.y , this.blood.Width, this.blood.Height);
     ctx.fill();
   }
   update(){
-    console.log(this.jumpPower);
     if (keyboard.space && this.onGround) { this.dy = this.jumpPower }
     if(this.collided){
-      this.blood.bloodContainerWidth -= 2;
+      this.blood.Width -= 2;
       this.collided = false;
-      if(this.blood.bloodContainerWidth == 0){
+      if(this.blood.Width == 0){
         gameOver = true;
       }
     }
@@ -90,7 +88,7 @@ class Dino {
 }
 }
 //////////
-/////////Cactus
+/////////Cactus class
 class Cactus {
   constructor(){
     this.x = CANVAS_WIDTH ;
@@ -112,50 +110,26 @@ class Cactus {
     this.x += this.dx;
   }
 }
-//////////
+////////// Initialize dino and cactus
 var dino = new Dino();
 var cactus1 = new Cactus();
 var cactus2 = new Cactus();
 var cactusArray = [];
 cactusArray.push(cactus1);
 cactusArray.push(cactus2);
+
 // show instruction
 var showI = true;
 //game state
 var gameOver = false;
-// var resetClick = false;
-// var requestId = 0;
+
 //game over and reset image
 const gameOverImg = new Image();
 const reset = new Image();
 gameOverImg.src = './Other/GameOver.png';
 reset.src = './Other/Reset.png';
-// when click on reset button to restart game
-// reset.addEventListener('click', function(e){
-//   startGame();
-//   animate();
-// });
 
-// function handleGameStatus(){
-//   if(showI){
-//     if(keyboard.any){ // don't understand this line
-//       keyboard.any = false;
-//       showI = false;
-//     }
-//     ctx.textAlign = "center";
-//     ctx.font = "24px arial";
-//     ctx.fillStyle = "#000";
-//     ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
-//     dino.draw();
-//   }
-//   if(gameOver){
-//     ctx.fillStyle = 'black';
-//     ctx.font = '60px Arial';
-//     ctx.fillText('Game Over', 0,0);
-//     // ctx.drawImage(gameOverImg, 107, 50, 386, 40);
-//     // ctx.drawImage(reset, 262, 100, 75, 101);
-//   }
-// }
+// for reset button
 canvas.addEventListener('click', function(e){
   if(gameOver){
     if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
@@ -172,24 +146,32 @@ canvas.addEventListener('click', function(e){
   }
 })
 
+function startGame(){
+  if(keyboard.any){ // don't understand this line
+    keyboard.any = false;
+    showI = false;
+  }
+  ctx.textAlign = "center";
+  ctx.font = "24px arial";
+  ctx.fillStyle = "#000";
+  ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
+  dino.draw();
+}
+
+function gameOverMsg(){
+  // ctx.fillStyle = 'black';
+  // ctx.font = '60px Arial';
+  // ctx.fillText('Game Over', 0,0);
+  ctx.drawImage(gameOverImg, 107, 50, 386, 40);
+  ctx.drawImage(reset, 262, 100, 75, 101);
+}
+
 function animate(){
   if(showI){
-    if(keyboard.any){ // don't understand this line
-      keyboard.any = false;
-      showI = false;
-    }
-    ctx.textAlign = "center";
-    ctx.font = "24px arial";
-    ctx.fillStyle = "#000";
-    ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
-    dino.draw();
+    startGame();
   }
   if(gameOver){
-     // ctx.fillStyle = 'black';
-     // ctx.font = '60px Arial';
-     // ctx.fillText('Game Over', 0,0);
-     ctx.drawImage(gameOverImg, 107, 50, 386, 40);
-     ctx.drawImage(reset, 262, 100, 75, 101);
+     gameOverMsg();
    }
   if(!showI && !gameOver){
     ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
