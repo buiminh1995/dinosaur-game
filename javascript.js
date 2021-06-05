@@ -167,9 +167,7 @@ canvas.addEventListener('click', function(e){
       cactusArray.push(cactus2);
       showI = true;
       gameOver = false;
-      resetClick = false;
       ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
-      animate();
     }
   }
 })
