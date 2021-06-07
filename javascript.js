@@ -37,18 +37,24 @@ const world = {
   gravity: 0.3, // strength per frame of gravity //prev 0.2
   drag: 0.999, // play with this value to change drag
   groundDrag: 0.9, // play with this value to change ground movement
-  ground: 253,
+  ground: 240,
+}
+
+var dinoScore = {
+  x: 500,
+  y: 20,
+  score: 0,
 }
 
 //////////Dinosaur class
 class Dino {
   constructor(){
-    this.x = 3 ;
-    this.y = 193;
+    this.x = 10 ;
+    this.y = 180;
     this.dx = 0; // delta x and y
     this.dy = 0;
     this.onGround = false;
-    this.jumpPower = -7;  // power of jump smaller jumps higher eg -10 smaller than -5
+    this.jumpPower = -8;  // power of jump smaller jumps higher eg -10 smaller than -5
     this.moveSpeed = 2;
     this.width = 20;
     this.height = 60;
@@ -76,7 +82,7 @@ class Dino {
       }
     }
     this.dy += world.gravity;
-    this.dy *= world.drag;
+    // this.dy *= world.drag;
     this.y += this.dy
     if (this.y + this.height >= world.ground) {
       this.y = world.ground - this.height;
@@ -92,11 +98,12 @@ class Dino {
 class Cactus {
   constructor(){
     this.x = CANVAS_WIDTH ;
-    this.y = 193;
+    this.y = 180;
     this.dx = 0; // delta x
     this.moveSpeed = -5;
     this.width = 20;
     this.height = 60;
+    this.alreadyCollided = false;
   }
   draw(){
     ctx.beginPath();
@@ -104,30 +111,12 @@ class Cactus {
     ctx.stroke();
   }
   update(){
-    console.log(this.moveSpeed);
     this.dx = this.moveSpeed
     this.dx *= world.drag;
     this.x += this.dx;
   }
 }
-////////// Initialize dino and cactus
-var dino = new Dino();
-var cactus1 = new Cactus();
-var cactus2 = new Cactus();
-var cactusArray = [];
-cactusArray.push(cactus1);
-cactusArray.push(cactus2);
 
-// show instruction
-var showI = true;
-//game state
-var gameOver = false;
-
-//game over and reset image
-const gameOverImg = new Image();
-const reset = new Image();
-gameOverImg.src = './Other/GameOver.png';
-reset.src = './Other/Reset.png';
 
 // for reset button
 canvas.addEventListener('click', function(e){
@@ -141,6 +130,11 @@ canvas.addEventListener('click', function(e){
       cactusArray.push(cactus2);
       showI = true;
       gameOver = false;
+      dinoScore.score = 0;
+      cactusSpeedIncrease = 0;
+      scoreIncrease = 1;
+      dinoScoreIncCounter = 0;
+      trackSpeed = 5;
       ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     }
   }
@@ -152,10 +146,11 @@ function startGame(){
     showI = false;
   }
   ctx.textAlign = "center";
-  ctx.font = "24px arial";
-  ctx.fillStyle = "#000";
+  ctx.font = "24px 'Press Start 2P'";
+  // ctx.fillStyle = "#000";
   ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
   dino.draw();
+  ctx.drawImage(trackImg1,x1TrackImg, 220);
 }
 
 function gameOverMsg(){
@@ -166,6 +161,46 @@ function gameOverMsg(){
   ctx.drawImage(reset, 262, 100, 75, 101);
 }
 
+function drawTrack(){
+  ctx.drawImage(trackImg1,x1TrackImg, 220);
+  ctx.drawImage(trackImg2,x2TrackImg, 220);
+  if(x1TrackImg < -2404) {x1TrackImg = 2404 - trackSpeed;}
+  else {x1TrackImg -= trackSpeed;}
+  if(x2TrackImg < -2404){x2TrackImg = 2404 - trackSpeed;}
+  else{x2TrackImg -= trackSpeed;}
+}
+////////// Initialize dino and cactus
+var dino = new Dino();
+var cactus1 = new Cactus();
+var cactus2 = new Cactus();
+var cactusArray = [];
+cactusArray.push(cactus1);
+cactusArray.push(cactus2);
+
+// show instruction
+var showI = true;
+//game state
+var gameOver = false;
+//cactus increase moveSpeed
+var cactusSpeedIncrease = 0;
+var scoreIncrease = 0.2;
+var dinoScoreIncCounter = 0;
+
+
+//game over and reset image
+const gameOverImg = new Image();
+const reset = new Image();
+gameOverImg.src = './Other/GameOver.png';
+reset.src = './Other/Reset.png';
+//track aka background
+const trackImg1 = new Image();
+const trackImg2 = new Image();
+trackImg1.src = './Other/Track.png';
+trackImg2.src = './Other/Track.png';
+let x1TrackImg = 0;
+let x2TrackImg = 2404;
+let trackSpeed = 5;
+
 function animate(){
   if(showI){
     startGame();
@@ -175,6 +210,19 @@ function animate(){
    }
   if(!showI && !gameOver){
     ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
+    drawTrack();
+    ctx.font = "15px 'Press Start 2P'";
+    ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
+    if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
+      cactusSpeedIncrease += 0.25; //0.2
+      trackSpeed += 0.25; //0.2
+      scoreIncrease += 0.15; //0.1
+      dinoScoreIncCounter = 0;
+      // console.log(dinoScoreIncCounter,cactusSpeedIncrease,scoreIncrease);
+    }
+    //console.log(cactusSpeedIncrease);
+    dinoScore.score += scoreIncrease;
+    dinoScoreIncCounter += scoreIncrease;
     dino.update();
     dino.draw();
     if(cactusArray[0].x < -20){
@@ -182,19 +230,24 @@ function animate(){
     }
     if(cactusArray.length == 0){
       let cactus1 = new Cactus();
+      cactus1.moveSpeed -= cactusSpeedIncrease;
       cactusArray.push(cactus1);
     }
     if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
         if(Math.floor(Math.random() * 38) == 2){
           let cactus = new Cactus();
+          cactus.moveSpeed -= cactusSpeedIncrease;
           cactusArray.push(cactus);
-        }
+      }
     }
     for (var i = 0; i < cactusArray.length; i++) {
       cactusArray[i].update();
       cactusArray[i].draw();
-      if(cactusArray[i].x >= dino.x && (cactusArray[i].x - dino.x) < dino.width && (cactusArray[i].y - dino.y) < dino.width){
-        dino.collided = true;
+      if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
+        if(cactusArray[i].alreadyCollided == false){
+          dino.collided = true;
+          cactusArray[i].alreadyCollided = true;
+        }
       }
     }
   }
