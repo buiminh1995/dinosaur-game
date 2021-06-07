@@ -1,9 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* @font-face {
+  font-family: 'Amatica SC';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Amatica SC'), url(https://fonts.gstatic.com/s/amaticasc/v1/r4IyjqPgTL10SERuDuUzpAzyDMXhdD8sAj6OAJTFsBI.woff2) format('woff2');
+} */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Press Start 2P'
+  /* font-family: PressStart2P; */
 }
 body {
   width: 100vw;

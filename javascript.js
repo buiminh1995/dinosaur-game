@@ -1,9 +1,13 @@
 const canvas = document.querySelector('#canvas')
 const ctx = canvas.getContext('2d');
-
 CANVAS_WIDTH = canvas.width = 600;
 CANVAS_HEIGHT = canvas.height = 253;
 
+const FONT_NAME = 'Press Start 2P';
+WebFont.load({
+		google: {families: [FONT_NAME]},
+  	active: startGame
+});
 // Simple keyboard handler
 const keyboard = (() => {
   document.addEventListener("keydown", keyHandler);
@@ -145,8 +149,8 @@ function startGame(){
     keyboard.any = false;
     showI = false;
   }
+  ctx.font = `24px '${FONT_NAME}'`;
   ctx.textAlign = "center";
-  ctx.font = "24px 'Press Start 2P'";
   // ctx.fillStyle = "#000";
   ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
   dino.draw();
@@ -202,6 +206,7 @@ let x2TrackImg = 2404;
 let trackSpeed = 5;
 
 function animate(){
+  ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
   if(showI){
     startGame();
   }
@@ -209,9 +214,8 @@ function animate(){
      gameOverMsg();
    }
   if(!showI && !gameOver){
-    ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     drawTrack();
-    ctx.font = "15px 'Press Start 2P'";
+    ctx.font = `15px '${FONT_NAME}'`;
     ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
     if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
       cactusSpeedIncrease += 0.25; //0.2
@@ -254,3 +258,4 @@ function animate(){
   requestAnimationFrame(animate);
 }
 animate();
+// document.fonts.load('10pt "Amatica SC"').then(animate);
