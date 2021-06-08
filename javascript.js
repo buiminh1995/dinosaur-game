@@ -3,11 +3,14 @@ const ctx = canvas.getContext('2d');
 CANVAS_WIDTH = canvas.width = 600;
 CANVAS_HEIGHT = canvas.height = 253;
 
+// Font for game
 const FONT_NAME = 'Press Start 2P';
-WebFont.load({
-		google: {families: [FONT_NAME]},
-  	active: startGame
-});
+document.fonts.load('10px "Press Start 2P"').then(startGame);
+// WebFont.load({
+// 		google: {families: [FONT_NAME]},
+//   	active: startGame,
+// });
+
 // Simple keyboard handler
 const keyboard = (() => {
   document.addEventListener("keydown", keyHandler);
@@ -144,7 +147,7 @@ canvas.addEventListener('click', function(e){
   }
 })
 
-function startGame(){
+async function startGame(){
   if(keyboard.any){ // don't understand this line
     keyboard.any = false;
     showI = false;
@@ -152,7 +155,7 @@ function startGame(){
   ctx.font = `24px '${FONT_NAME}'`;
   ctx.textAlign = "center";
   // ctx.fillStyle = "#000";
-  ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
+  await ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
   dino.draw();
   ctx.drawImage(trackImg1,x1TrackImg, 220);
 }
@@ -204,6 +207,7 @@ trackImg2.src = './Other/Track.png';
 let x1TrackImg = 0;
 let x2TrackImg = 2404;
 let trackSpeed = 5;
+
 
 function animate(){
   ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -258,4 +262,3 @@ function animate(){
   requestAnimationFrame(animate);
 }
 animate();
-// document.fonts.load('10pt "Amatica SC"').then(animate);
