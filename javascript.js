@@ -4,12 +4,13 @@ CANVAS_WIDTH = canvas.width = 600;
 CANVAS_HEIGHT = canvas.height = 253;
 
 // Font for game
+// let f = new FontFace('test', 'url(x)');
+//
+// f.load().then(function() {
+//   // Ready to use the font in a canvas context
+// });
 const FONT_NAME = 'Press Start 2P';
 document.fonts.load('10px "Press Start 2P"').then(startGame);
-// WebFont.load({
-// 		google: {families: [FONT_NAME]},
-//   	active: startGame,
-// });
 
 // Simple keyboard handler
 const keyboard = (() => {
@@ -48,9 +49,10 @@ const world = {
 }
 
 var dinoScore = {
-  x: 500,
+  x: 350,
   y: 20,
   score: 0,
+  hiScore: 0,
 }
 
 //////////Dinosaur class
@@ -142,12 +144,13 @@ canvas.addEventListener('click', function(e){
       scoreIncrease = 1;
       dinoScoreIncCounter = 0;
       trackSpeed = 5;
-      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //delete Gameover and reset image
     }
   }
 })
 
 async function startGame(){
+  ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); // clear the 'Click SPACE to start' line with the annoying default font
   if(keyboard.any){ // don't understand this line
     keyboard.any = false;
     showI = false;
@@ -155,7 +158,7 @@ async function startGame(){
   ctx.font = `24px '${FONT_NAME}'`;
   ctx.textAlign = "center";
   // ctx.fillStyle = "#000";
-  await ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80);
+  await ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80); //still the same with 'await' or not
   dino.draw();
   ctx.drawImage(trackImg1,x1TrackImg, 220);
 }
@@ -175,6 +178,29 @@ function drawTrack(){
   else {x1TrackImg -= trackSpeed;}
   if(x2TrackImg < -2404){x2TrackImg = 2404 - trackSpeed;}
   else{x2TrackImg -= trackSpeed;}
+}
+
+// function printScore(){
+//   ctx.font = `15px '${FONT_NAME}'`;
+//   ctx.fillText(`HI`, dinoScore.x, dinoScore.y);
+//   if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
+//     window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
+//   }
+//   ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x + 50, dinoScore.y);
+//   ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x + 100, dinoScore.y);
+// }
+
+function updateCactusSpeed(){
+  if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
+    cactusSpeedIncrease += 0.25; //0.2
+    trackSpeed += 0.25; //0.2
+    scoreIncrease += 0.15; //0.1
+    dinoScoreIncCounter = 0;
+    // console.log(dinoScoreIncCounter,cactusSpeedIncrease,scoreIncrease);
+  }
+  //console.log(cactusSpeedIncrease);
+  dinoScore.score += scoreIncrease;
+  dinoScoreIncCounter += scoreIncrease;
 }
 ////////// Initialize dino and cactus
 var dino = new Dino();
@@ -199,6 +225,7 @@ const gameOverImg = new Image();
 const reset = new Image();
 gameOverImg.src = './Other/GameOver.png';
 reset.src = './Other/Reset.png';
+
 //track aka background
 const trackImg1 = new Image();
 const trackImg2 = new Image();
@@ -210,7 +237,6 @@ let trackSpeed = 5;
 
 
 function animate(){
-  ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
   if(showI){
     startGame();
   }
@@ -218,19 +244,13 @@ function animate(){
      gameOverMsg();
    }
   if(!showI && !gameOver){
+    ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //clear past animation (prev position, drawing...) of previous loop
     drawTrack();
     ctx.font = `15px '${FONT_NAME}'`;
-    ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
-    if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
-      cactusSpeedIncrease += 0.25; //0.2
-      trackSpeed += 0.25; //0.2
-      scoreIncrease += 0.15; //0.1
-      dinoScoreIncCounter = 0;
-      // console.log(dinoScoreIncCounter,cactusSpeedIncrease,scoreIncrease);
-    }
-    //console.log(cactusSpeedIncrease);
-    dinoScore.score += scoreIncrease;
-    dinoScoreIncCounter += scoreIncrease;
+     ctx.fillText(`HI`, dinoScore.x, dinoScore.y);
+     ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x + 100, dinoScore.y);
+     ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x + 180, dinoScore.y);
+    updateCactusSpeed();
     dino.update();
     dino.draw();
     if(cactusArray[0].x < -20){
