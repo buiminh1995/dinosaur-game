@@ -49,7 +49,7 @@ const world = {
 }
 
 var dinoScore = {
-  x: 350,
+  x: 520,
   y: 20,
   score: 0,
   hiScore: 0,
@@ -246,10 +246,14 @@ function animate(){
   if(!showI && !gameOver){
     ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //clear past animation (prev position, drawing...) of previous loop
     drawTrack();
+    if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
+          window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
+    }
     ctx.font = `15px '${FONT_NAME}'`;
-     ctx.fillText(`HI`, dinoScore.x, dinoScore.y);
-     ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x + 100, dinoScore.y);
-     ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x + 180, dinoScore.y);
+    ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
+    let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
+    ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
+    ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
     updateCactusSpeed();
     dino.update();
     dino.draw();
