@@ -7,15 +7,8 @@ CANVAS_HEIGHT = canvas.height = 253;
 //only when Google font is loaded then we startGame
 const FONT_NAME = 'Press Start 2P';
 document.fonts.load('10px "Press Start 2P"').then(startGame);
-// Font for game
-// let f = new FontFace('test', 'url(x)');
-//
-// f.load().then(function() {
-//   // Ready to use the font in a canvas context
-// });
 
-
-// Simple keyboard handler
+// SIMPLE KEYBOARD HANDLER
 const keyboard = (() => {
   document.addEventListener("keydown", keyHandler);
   document.addEventListener("keyup", keyHandler);
@@ -43,7 +36,7 @@ const keyboard = (() => {
   return keyboard;
 })();
 
-// define world
+// define WORLD
 const world = {
   gravity: 0.3, // strength per frame of gravity //prev 0.2
   drag: 0.999, // play with this value to change drag
@@ -58,8 +51,8 @@ var dinoScore = {
   hiScore: 0,
 }
 
-//////////Dinosaur class
 var dinoImg = new Object();
+
 //Declare new Image objects for dino
 dinoImg.dinoDead = new Image();
 dinoImg.dinoDuck1 = new Image();
@@ -76,6 +69,8 @@ dinoImg.dinoDuck2.src = './Dino/DinoDuck2.png';
 dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
 dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
 dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
+
+//CLASS DINO
 class Dino {
   constructor(){
     this.x = 10 ;
@@ -93,6 +88,7 @@ class Dino {
       legIncrement: 0,
       currentLeg: 1,
     }
+
     this.blood = {
       x: 10,
       y: 10,
@@ -136,6 +132,22 @@ class Dino {
       this.onGround = false;
     }
 }
+  handleLegMovement(){
+    if(this.handleLeg.currentLeg == 1) {
+      this.handleLeg.legIncrement++;
+    }
+    if(this.handleLeg.currentLeg == 2) {
+      this.handleLeg.legIncrement--;
+    }
+    if(this.handleLeg.legIncrement == 10) {
+      this.handleLeg.currentLeg = 2;
+      this.handleLeg.legIncrement = 0;
+    }
+    if(this.handleLeg.legIncrement == -10) {
+      this.handleLeg.currentLeg = 1;
+      this.handleLeg.legIncrement = 0;
+    }
+  }
 }
 //////////
 /////////Cactus class
@@ -161,31 +173,6 @@ class Cactus {
   }
 }
 
-
-// for reset button
-canvas.addEventListener('click', function(e){
-  if(gameOver){
-    if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
-      dino = new Dino();
-      cactus1 = new Cactus();
-      cactus2 = new Cactus();
-      cactusArray = [];
-      cactusArray.push(cactus1);
-      cactusArray.push(cactus2);
-      showI = true;
-      gameOver = false;
-      cactusSpeedIncrease = 0;
-      scoreIncrease = 0.2;
-      dinoScoreIncCounter = 0;
-      trackSpeed = 5;
-      dinoScore.x = 520,
-      dinoScore.y = 20,
-      dinoScore.score =  0,
-      dinoScore.hiScore = 0,
-      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //delete Gameover and reset image
-    }
-  }
-})
 
 async function startGame(){
   ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); // clear the 'Click SPACE to start' line with the annoying default font
@@ -218,17 +205,20 @@ function drawTrack(){
   else{x2TrackImg -= trackSpeed;}
 }
 
-// function printScore(){
-//   ctx.font = `15px '${FONT_NAME}'`;
-//   ctx.fillText(`HI`, dinoScore.x, dinoScore.y);
-//   if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
-//     window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
-//   }
-//   ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x + 50, dinoScore.y);
-//   ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x + 100, dinoScore.y);
-// }
+ function printScore(){
+   if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
+         window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
+   }
+   ctx.font = `15px '${FONT_NAME}'`;
+   ctx.fillStyle = "#535353";
+   ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
+   let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
+   ctx.fillStyle = "#747474";
+   ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
+   ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
+}
 
-function updateCactusSpeed(){
+function updateCactus_Track_Score_Speed(){
   if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
     cactusSpeedIncrease += 0.25; //0.2
     trackSpeed += 0.25; //0.2
@@ -240,6 +230,63 @@ function updateCactusSpeed(){
   dinoScore.score += scoreIncrease;
   dinoScoreIncCounter += scoreIncrease;
 }
+
+function generateCactus(){
+  if(cactusArray[0].x < -20){
+    cactusArray.splice(0, 1);
+  }
+  if(cactusArray.length == 0){
+    let cactus1 = new Cactus();
+    cactus1.moveSpeed -= cactusSpeedIncrease;
+    cactusArray.push(cactus1);
+  }
+  if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
+      if(Math.floor(Math.random() * 38) == 2){
+        let cactus = new Cactus();
+        cactus.moveSpeed -= cactusSpeedIncrease;
+        cactusArray.push(cactus);
+    }
+  }
+}
+
+function handleCollisionCactusDino(){
+  for (var i = 0; i < cactusArray.length; i++) {
+    cactusArray[i].update();
+    cactusArray[i].draw();
+    if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
+      if(cactusArray[i].alreadyCollided == false){
+        dino.collided = true;
+        cactusArray[i].alreadyCollided = true;
+      }
+    }
+  }
+}
+
+// for reset button
+canvas.addEventListener('click', function(e){
+  if(gameOver){
+    if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
+      dino = new Dino();
+      cactus1 = new Cactus();
+      cactus2 = new Cactus();
+      cactusArray = [];
+      cactusArray.push(cactus1);
+      cactusArray.push(cactus2);
+      showI = true;
+      gameOver = false;
+      cactusSpeedIncrease = 0;
+      scoreIncrease = 0.2;
+      dinoScoreIncCounter = 0;
+      trackSpeed = 5;
+      dinoScore.x = 520,
+      dinoScore.y = 20,
+      dinoScore.score =  0,
+      dinoScore.hiScore = 0,
+      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //delete Gameover and reset image
+    }
+  }
+})
+
 ////////// Initialize DINO and CACTUS
 var dino = new Dino();
 var cactus1 = new Cactus();
@@ -248,17 +295,16 @@ var cactusArray = [];
 cactusArray.push(cactus1);
 cactusArray.push(cactus2);
 
-// show instruction
+// if true show instructions
 var showI = true;
 
-//game state
+// if true show Game Over images and reset button
 var gameOver = false;
 
 //cactus increase moveSpeed
 var cactusSpeedIncrease = 0;
 var scoreIncrease = 0.2;
-var dinoScoreIncCounter = 0;
-
+var dinoScoreIncCounter = 0; //if reach 500 cactus and score's speed increases
 
 //game over and reset image
 const gameOverImg = new Image();
@@ -271,6 +317,7 @@ const trackImg1 = new Image();
 const trackImg2 = new Image();
 trackImg1.src = './Other/Track.png';
 trackImg2.src = './Other/Track.png';
+// this is to make track run with cactus
 let x1TrackImg = 0;
 let x2TrackImg = 2404;
 let trackSpeed = 5;
@@ -298,59 +345,14 @@ function animate(){
     if(!showI && !gameOver){
       ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //clear past animation (prev position, drawing...) of previous loop
       drawTrack();
-      if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
-            window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
-      }
-      ctx.font = `15px '${FONT_NAME}'`;
-      ctx.fillStyle = "#535353";
-      ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
-      let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
-      ctx.fillStyle = "#747474";
-      ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
-      ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
-      updateCactusSpeed();
+      printScore();
+      updateCactus_Track_Score_Speed();
       dino.state = "playing";
-      if(dino.handleLeg.currentLeg == 1) {
-        dino.handleLeg.legIncrement++;
-      }
-      if(dino.handleLeg.currentLeg == 2) {
-        dino.handleLeg.legIncrement--;
-      }
-      if(dino.handleLeg.legIncrement == 15) {
-        dino.handleLeg.currentLeg = 2;
-        dino.handleLeg.legIncrement = 0;
-      }
-      if(dino.handleLeg.legIncrement == -15) {
-        dino.handleLeg.currentLeg = 1;
-        dino.handleLeg.legIncrement = 0;
-      }
+      dino.handleLegMovement();
       dino.update();
       dino.draw();
-      if(cactusArray[0].x < -20){
-        cactusArray.splice(0, 1);
-      }
-      if(cactusArray.length == 0){
-        let cactus1 = new Cactus();
-        cactus1.moveSpeed -= cactusSpeedIncrease;
-        cactusArray.push(cactus1);
-      }
-      if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
-          if(Math.floor(Math.random() * 38) == 2){
-            let cactus = new Cactus();
-            cactus.moveSpeed -= cactusSpeedIncrease;
-            cactusArray.push(cactus);
-        }
-      }
-      for (var i = 0; i < cactusArray.length; i++) {
-        cactusArray[i].update();
-        cactusArray[i].draw();
-        if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
-          if(cactusArray[i].alreadyCollided == false){
-            dino.collided = true;
-            cactusArray[i].alreadyCollided = true;
-          }
-        }
-      }
+      generateCactus();
+      handleCollisionCactusDino();
     }
   }
   requestAnimationFrame(animate);
