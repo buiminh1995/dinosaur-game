@@ -102,18 +102,17 @@ class Dino {
 
   }
   draw(){
-    ctx.beginPath();
     if(this.state == "start" || !this.onGround){
       ctx.drawImage(dinoImg.dinoStart, 0, 0, 88, 94, this.x, this.y, 44, 47);
     }
     if(this.onGround){
       if(this.handleLeg.currentLeg == 1){
         ctx.drawImage(dinoImg.dinoRun1, 0, 0, 87, 94, this.x, this.y, 44, 47);
-      }
-      else if(this.handleLeg.currentLeg == 2){
+      } else if(this.handleLeg.currentLeg == 2){
         ctx.drawImage(dinoImg.dinoRun2, 0, 0, 87, 94, this.x, this.y, 44, 47);
       }
     }
+    ctx.beginPath();
     ctx.rect(this.blood.x, this.blood.y , this.blood.Width, this.blood.Height);
     ctx.fill();
   }
@@ -310,17 +309,18 @@ function animate(){
       ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
       ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
       updateCactusSpeed();
+      dino.state = "playing";
       if(dino.handleLeg.currentLeg == 1) {
         dino.handleLeg.legIncrement++;
       }
       if(dino.handleLeg.currentLeg == 2) {
         dino.handleLeg.legIncrement--;
       }
-      if(dino.handleLeg.legIncrement == 99999999999) {
+      if(dino.handleLeg.legIncrement == 15) {
         dino.handleLeg.currentLeg = 2;
         dino.handleLeg.legIncrement = 0;
       }
-      if(dino.handleLeg.legIncrement == -99999999999) {
+      if(dino.handleLeg.legIncrement == -15) {
         dino.handleLeg.currentLeg = 1;
         dino.handleLeg.legIncrement = 0;
       }
@@ -356,4 +356,4 @@ function animate(){
   requestAnimationFrame(animate);
 }
 //animate();
-startAnimating(10);
+startAnimating(50);
