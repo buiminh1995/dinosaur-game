@@ -1,16 +1,19 @@
+//CANVAS
 const canvas = document.querySelector('#canvas')
 const ctx = canvas.getContext('2d');
 CANVAS_WIDTH = canvas.width = 600;
 CANVAS_HEIGHT = canvas.height = 253;
 
+//only when Google font is loaded then we startGame
+const FONT_NAME = 'Press Start 2P';
+document.fonts.load('10px "Press Start 2P"').then(startGame);
 // Font for game
 // let f = new FontFace('test', 'url(x)');
 //
 // f.load().then(function() {
 //   // Ready to use the font in a canvas context
 // });
-const FONT_NAME = 'Press Start 2P';
-document.fonts.load('10px "Press Start 2P"').then(startGame);
+
 
 // Simple keyboard handler
 const keyboard = (() => {
@@ -56,28 +59,61 @@ var dinoScore = {
 }
 
 //////////Dinosaur class
+var dinoImg = new Object();
+//Declare new Image objects for dino
+dinoImg.dinoDead = new Image();
+dinoImg.dinoDuck1 = new Image();
+dinoImg.dinoDuck2 = new Image();
+dinoImg.dinoJump = new Image();
+dinoImg.dinoRun1 = new Image();
+dinoImg.dinoRun2 = new Image();
+dinoImg.dinoStart = new Image();
+
+//Source for Image objects
+dinoImg.dinoDead.src = './Dino/DinoDead.png';
+dinoImg.dinoDuck1.src = './Dino/DinoDuck1.png';
+dinoImg.dinoDuck2.src = './Dino/DinoDuck2.png';
+dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
+dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
+dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
 class Dino {
   constructor(){
     this.x = 10 ;
-    this.y = 180;
+    this.y = 193;
     this.dx = 0; // delta x and y
     this.dy = 0;
+    this.width = 44;
+    this.height = 47;
     this.onGround = false;
     this.jumpPower = -8;  // power of jump smaller jumps higher eg -10 smaller than -5
     this.moveSpeed = 2;
-    this.width = 20;
-    this.height = 60;
     this.collided = false;
+    this.state = "start";
+    this.handleLeg = {
+      legIncrement: 0,
+      currentLeg: 1,
+    }
     this.blood = {
       x: 10,
       y: 10,
       Width: 50,
       Height: 10,
     }
+
   }
   draw(){
     ctx.beginPath();
-    ctx.rect(this.x, this.y , this.width, this.height);
+    if(this.state == "start" || !this.onGround){
+      ctx.drawImage(dinoImg.dinoStart, 0, 0, 88, 94, this.x, this.y, 44, 47);
+    }
+    if(this.onGround){
+      if(this.handleLeg.currentLeg == 1){
+        ctx.drawImage(dinoImg.dinoRun1, 0, 0, 87, 94, this.x, this.y, 44, 47);
+      }
+      else if(this.handleLeg.currentLeg == 2){
+        ctx.drawImage(dinoImg.dinoRun2, 0, 0, 87, 94, this.x, this.y, 44, 47);
+      }
+    }
     ctx.rect(this.blood.x, this.blood.y , this.blood.Width, this.blood.Height);
     ctx.fill();
   }
@@ -139,11 +175,14 @@ canvas.addEventListener('click', function(e){
       cactusArray.push(cactus2);
       showI = true;
       gameOver = false;
-      dinoScore.score = 0;
       cactusSpeedIncrease = 0;
-      scoreIncrease = 1;
+      scoreIncrease = 0.2;
       dinoScoreIncCounter = 0;
       trackSpeed = 5;
+      dinoScore.x = 520,
+      dinoScore.y = 20,
+      dinoScore.score =  0,
+      dinoScore.hiScore = 0,
       ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //delete Gameover and reset image
     }
   }
@@ -202,7 +241,7 @@ function updateCactusSpeed(){
   dinoScore.score += scoreIncrease;
   dinoScoreIncCounter += scoreIncrease;
 }
-////////// Initialize dino and cactus
+////////// Initialize DINO and CACTUS
 var dino = new Dino();
 var cactus1 = new Cactus();
 var cactus2 = new Cactus();
@@ -212,8 +251,10 @@ cactusArray.push(cactus2);
 
 // show instruction
 var showI = true;
+
 //game state
 var gameOver = false;
+
 //cactus increase moveSpeed
 var cactusSpeedIncrease = 0;
 var scoreIncrease = 0.2;
@@ -235,54 +276,84 @@ let x1TrackImg = 0;
 let x2TrackImg = 2404;
 let trackSpeed = 5;
 
+let fps, fpsInterval, startTime, now, then, elapsed;
+
+function startAnimating(fps){
+  fpsInterval = 1000/fps;
+  then = Date.now();
+  startTime = then;
+  animate();
+}
 
 function animate(){
-  if(showI){
-    startGame();
-  }
-  if(gameOver){
-     gameOverMsg();
-   }
-  if(!showI && !gameOver){
-    ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //clear past animation (prev position, drawing...) of previous loop
-    drawTrack();
-    if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
-          window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
+  now = Date.now();
+  elapsed = now - then;
+  if(elapsed > fpsInterval){
+    then = now - (elapsed%fpsInterval);
+    if(showI){
+      startGame();
     }
-    ctx.font = `15px '${FONT_NAME}'`;
-    ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
-    let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
-    ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
-    ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
-    updateCactusSpeed();
-    dino.update();
-    dino.draw();
-    if(cactusArray[0].x < -20){
-      cactusArray.splice(0, 1);
-    }
-    if(cactusArray.length == 0){
-      let cactus1 = new Cactus();
-      cactus1.moveSpeed -= cactusSpeedIncrease;
-      cactusArray.push(cactus1);
-    }
-    if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
-        if(Math.floor(Math.random() * 38) == 2){
-          let cactus = new Cactus();
-          cactus.moveSpeed -= cactusSpeedIncrease;
-          cactusArray.push(cactus);
+    if(gameOver){
+       gameOverMsg();
+     }
+    if(!showI && !gameOver){
+      ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); //clear past animation (prev position, drawing...) of previous loop
+      drawTrack();
+      if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
+            window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
       }
-    }
-    for (var i = 0; i < cactusArray.length; i++) {
-      cactusArray[i].update();
-      cactusArray[i].draw();
-      if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
-        if(cactusArray[i].alreadyCollided == false){
-          dino.collided = true;
-          cactusArray[i].alreadyCollided = true;
+      ctx.font = `15px '${FONT_NAME}'`;
+      ctx.fillStyle = "#535353";
+      ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
+      let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
+      ctx.fillStyle = "#747474";
+      ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
+      ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
+      updateCactusSpeed();
+      if(dino.handleLeg.currentLeg == 1) {
+        dino.handleLeg.legIncrement++;
+      }
+      if(dino.handleLeg.currentLeg == 2) {
+        dino.handleLeg.legIncrement--;
+      }
+      if(dino.handleLeg.legIncrement == 99999999999) {
+        dino.handleLeg.currentLeg = 2;
+        dino.handleLeg.legIncrement = 0;
+      }
+      if(dino.handleLeg.legIncrement == -99999999999) {
+        dino.handleLeg.currentLeg = 1;
+        dino.handleLeg.legIncrement = 0;
+      }
+      dino.update();
+      dino.draw();
+      if(cactusArray[0].x < -20){
+        cactusArray.splice(0, 1);
+      }
+      if(cactusArray.length == 0){
+        let cactus1 = new Cactus();
+        cactus1.moveSpeed -= cactusSpeedIncrease;
+        cactusArray.push(cactus1);
+      }
+      if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
+          if(Math.floor(Math.random() * 38) == 2){
+            let cactus = new Cactus();
+            cactus.moveSpeed -= cactusSpeedIncrease;
+            cactusArray.push(cactus);
+        }
+      }
+      for (var i = 0; i < cactusArray.length; i++) {
+        cactusArray[i].update();
+        cactusArray[i].draw();
+        if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
+          if(cactusArray[i].alreadyCollided == false){
+            dino.collided = true;
+            cactusArray[i].alreadyCollided = true;
+          }
         }
       }
     }
   }
   requestAnimationFrame(animate);
 }
-animate();
+//animate();
+startAnimating(10);
