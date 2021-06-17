@@ -8,6 +8,33 @@ CANVAS_HEIGHT = canvas.height = 253;
 const FONT_NAME = 'Press Start 2P';
 document.fonts.load('10px "Press Start 2P"').then(startGame);
 
+// if true show instructions
+var showI = true;
+
+// if true show Game Over images and reset button
+var gameOver = false;
+
+//cactus increase moveSpeed
+var cactusSpeedIncrease = 0;
+var scoreIncrease = 0.2;
+var dinoScoreIncCounter = 0; //if reach 500 cactus and score's speed increases
+
+//game over and reset image
+const gameOverImg = new Image();
+const reset = new Image();
+gameOverImg.src = './Other/GameOver.png';
+reset.src = './Other/Reset.png';
+
+//track that dino runs on
+const trackImg1 = new Image();
+const trackImg2 = new Image();
+trackImg1.src = './Other/Track.png';
+trackImg2.src = './Other/Track.png';
+// this is to make track run with cactus
+let x1TrackImg = 0;
+let x2TrackImg = 2404;
+let trackSpeed = 5;
+
 // SIMPLE KEYBOARD HANDLER
 const keyboard = (() => {
   document.addEventListener("keydown", keyHandler);
@@ -69,6 +96,24 @@ dinoImg.dinoDuck2.src = './Dino/DinoDuck2.png';
 dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
 dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
 dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
+
+var cactusImg = new Array();
+
+//Declare new Image objects for dino
+cactusImg[0] = new Image();
+cactusImg[1] = new Image();
+cactusImg[2] = new Image();
+cactusImg[3] = new Image();
+cactusImg[4] = new Image();
+cactusImg[5] = new Image();
+
+//Source for Image objects
+cactusImg[0].src = './Cactus/LargeCactus1.png'
+cactusImg[1].src = './Cactus/LargeCactus2.png'
+cactusImg[2].src = './Cactus/LargeCactus3.png'
+cactusImg[3].src = './Cactus/SmallCactus1.png'
+cactusImg[4].src = './Cactus/SmallCactus2.png'
+cactusImg[5].src = './Cactus/SmallCactus3.png'
 
 //CLASS DINO
 class Dino {
@@ -153,8 +198,9 @@ class Dino {
 /////////Cactus class
 class Cactus {
   constructor(){
+    this.imgObj = cactusImg[Math.floor(Math.random() * 6)];
     this.x = CANVAS_WIDTH ;
-    this.y = 180;
+    this.y = 240 - this.imgObj.naturalHeight/2;
     this.dx = 0; // delta x
     this.moveSpeed = -5;
     this.width = 20;
@@ -162,9 +208,7 @@ class Cactus {
     this.alreadyCollided = false;
   }
   draw(){
-    ctx.beginPath();
-    ctx.rect(this.x, this.y , this.width, this.height);
-    ctx.stroke();
+    ctx.drawImage(this.imgObj, 0, 0, this.imgObj.naturalWidth, this.imgObj.naturalHeight, this.x, this.y, this.imgObj.naturalWidth/2, this.imgObj.naturalHeight/2);
   }
   update(){
     this.dx = this.moveSpeed
@@ -295,32 +339,6 @@ var cactusArray = [];
 cactusArray.push(cactus1);
 cactusArray.push(cactus2);
 
-// if true show instructions
-var showI = true;
-
-// if true show Game Over images and reset button
-var gameOver = false;
-
-//cactus increase moveSpeed
-var cactusSpeedIncrease = 0;
-var scoreIncrease = 0.2;
-var dinoScoreIncCounter = 0; //if reach 500 cactus and score's speed increases
-
-//game over and reset image
-const gameOverImg = new Image();
-const reset = new Image();
-gameOverImg.src = './Other/GameOver.png';
-reset.src = './Other/Reset.png';
-
-//track aka background
-const trackImg1 = new Image();
-const trackImg2 = new Image();
-trackImg1.src = './Other/Track.png';
-trackImg2.src = './Other/Track.png';
-// this is to make track run with cactus
-let x1TrackImg = 0;
-let x2TrackImg = 2404;
-let trackSpeed = 5;
 
 let fps, fpsInterval, startTime, now, then, elapsed;
 
