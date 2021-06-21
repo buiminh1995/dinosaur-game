@@ -79,17 +79,21 @@ const keyboard = (() => {
     right: false,
     left: false,
     up: false,
+    down: false,
     space: false,
     any : false, // don't understand what this for
   };
   function keyHandler(e) {
-    const state = e.type === "keydown"
+    const state = e.type === "keydown" //if e.type is keydown then state == true
     if (e.keyCode == 39) {
       keyboard.right = state;
     } else if (e.keyCode == 37) {
       keyboard.left = state;
     } else if (e.keyCode == 38) {
       keyboard.up = state;
+      e.preventDefault();
+    } else if (e.keyCode == 40) {
+      keyboard.down = state;
       e.preventDefault();
     } else if(e.keyCode == 32){
       keyboard.space = state;
@@ -146,17 +150,26 @@ class Dino {
     }
     if(this.onGround){
       if(this.handleLeg.currentLeg == 1){
-        ctx.drawImage(dinoImg.dinoRun1, 0, 0, 87, 94, this.x, this.y, 44, 47);
+        if(keyboard.down == true){
+          ctx.drawImage(dinoImg.dinoDuck1, 0, 0, dinoImg.dinoDuck1.naturalWidth, dinoImg.dinoDuck1.naturalHeight, this.x, 240 - dinoImg.dinoDuck1.naturalHeight/2, dinoImg.dinoDuck1.naturalWidth/2, dinoImg.dinoDuck1.naturalHeight/2);
+        } else {
+          ctx.drawImage(dinoImg.dinoRun1, 0, 0, dinoImg.dinoRun1.naturalWidth, dinoImg.dinoRun1.naturalHeight, this.x, this.y, dinoImg.dinoRun1.naturalWidth/2, dinoImg.dinoRun1.naturalHeight/2);
+        }
       } else if(this.handleLeg.currentLeg == 2){
-        ctx.drawImage(dinoImg.dinoRun2, 0, 0, 87, 94, this.x, this.y, 44, 47);
+        if(keyboard.down == true){
+          ctx.drawImage(dinoImg.dinoDuck2, 0, 0, dinoImg.dinoDuck2.naturalWidth, dinoImg.dinoDuck2.naturalHeight, this.x + 1, 240 - dinoImg.dinoDuck2.naturalHeight/2, dinoImg.dinoDuck2.naturalWidth/2, dinoImg.dinoDuck2.naturalHeight/2);
+        } else {
+          ctx.drawImage(dinoImg.dinoRun2, 0, 0, dinoImg.dinoRun2.naturalWidth, dinoImg.dinoRun2.naturalHeight, this.x, this.y, dinoImg.dinoRun2.naturalWidth/2, dinoImg.dinoRun2.naturalHeight/2);
+        }
       }
     }
     ctx.beginPath();
+    ctx.fillStyle = "#535353";
     ctx.rect(this.blood.x, this.blood.y , this.blood.Width, this.blood.Height);
     ctx.fill();
   }
   update(){
-    if (keyboard.space && this.onGround) { this.dy = this.jumpPower }
+    if ((keyboard.space || keyboard.up) && this.onGround) { this.dy = this.jumpPower }
     if(this.collided){
       this.blood.Width -= 2;
       this.collided = false;
@@ -218,7 +231,7 @@ class Cactus {
 
 async function startGame(){
   ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); // clear the 'Click SPACE to start' line with the annoying default font
-  if(keyboard.any){ // don't understand this line
+  if(keyboard.space || keyboard.up){ // don't understand this line
     keyboard.any = false;
     showI = false;
   }
@@ -227,6 +240,7 @@ async function startGame(){
   // ctx.fillStyle = "#000";
   await ctx.fillText("Click SPACE to start", ctx.canvas.width / 2, 80); //still the same with 'await' or not
   dino.draw();
+  drawStaticStuff();
   ctx.drawImage(trackImg1,x1TrackImg, 220);
 }
 
@@ -304,6 +318,13 @@ function handleCollisionCactusDino(){
   }
 }
 
+function drawStaticStuff(){
+  ctx.beginPath();
+  ctx.fillStyle = "#000000";
+  ctx.rect(10, 10 , 50, 10.8); //10 10 50 10.5
+  ctx.stroke();
+}
+
 // for reset button
 canvas.addEventListener('click', function(e){
   if(gameOver){
@@ -369,6 +390,7 @@ function animate(){
       dino.handleLegMovement();
       dino.update();
       dino.draw();
+      drawStaticStuff();
       generateCactus();
       handleCollisionCactusDino();
     }
