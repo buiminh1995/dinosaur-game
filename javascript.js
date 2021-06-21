@@ -35,6 +35,42 @@ let x1TrackImg = 0;
 let x2TrackImg = 2404;
 let trackSpeed = 5;
 
+var dinoImg = new Object();
+//Declare new Image objects for dino
+dinoImg.dinoDead = new Image();
+dinoImg.dinoDuck1 = new Image();
+dinoImg.dinoDuck2 = new Image();
+dinoImg.dinoJump = new Image();
+dinoImg.dinoRun1 = new Image();
+dinoImg.dinoRun2 = new Image();
+dinoImg.dinoStart = new Image();
+
+//Source for Image objects
+dinoImg.dinoDead.src = './Dino/DinoDead.png';
+dinoImg.dinoDuck1.src = './Dino/DinoDuck1.png';
+dinoImg.dinoDuck2.src = './Dino/DinoDuck2.png';
+dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
+dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
+dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
+
+var cactusImg = new Array();
+
+//Declare new Image objects for dino
+cactusImg[0] = new Image();
+cactusImg[1] = new Image();
+cactusImg[2] = new Image();
+cactusImg[3] = new Image();
+cactusImg[4] = new Image();
+cactusImg[5] = new Image();
+
+//Source for Image objects
+cactusImg[0].src = './Cactus/LargeCactus1.png'
+cactusImg[1].src = './Cactus/LargeCactus2.png'
+cactusImg[2].src = './Cactus/LargeCactus3.png'
+cactusImg[3].src = './Cactus/SmallCactus1.png'
+cactusImg[4].src = './Cactus/SmallCactus2.png'
+cactusImg[5].src = './Cactus/SmallCactus3.png'
+
 // SIMPLE KEYBOARD HANDLER
 const keyboard = (() => {
   document.addEventListener("keydown", keyHandler);
@@ -78,43 +114,6 @@ var dinoScore = {
   hiScore: 0,
 }
 
-var dinoImg = new Object();
-
-//Declare new Image objects for dino
-dinoImg.dinoDead = new Image();
-dinoImg.dinoDuck1 = new Image();
-dinoImg.dinoDuck2 = new Image();
-dinoImg.dinoJump = new Image();
-dinoImg.dinoRun1 = new Image();
-dinoImg.dinoRun2 = new Image();
-dinoImg.dinoStart = new Image();
-
-//Source for Image objects
-dinoImg.dinoDead.src = './Dino/DinoDead.png';
-dinoImg.dinoDuck1.src = './Dino/DinoDuck1.png';
-dinoImg.dinoDuck2.src = './Dino/DinoDuck2.png';
-dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
-dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
-dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
-
-var cactusImg = new Array();
-
-//Declare new Image objects for dino
-cactusImg[0] = new Image();
-cactusImg[1] = new Image();
-cactusImg[2] = new Image();
-cactusImg[3] = new Image();
-cactusImg[4] = new Image();
-cactusImg[5] = new Image();
-
-//Source for Image objects
-cactusImg[0].src = './Cactus/LargeCactus1.png'
-cactusImg[1].src = './Cactus/LargeCactus2.png'
-cactusImg[2].src = './Cactus/LargeCactus3.png'
-cactusImg[3].src = './Cactus/SmallCactus1.png'
-cactusImg[4].src = './Cactus/SmallCactus2.png'
-cactusImg[5].src = './Cactus/SmallCactus3.png'
-
 //CLASS DINO
 class Dino {
   constructor(){
@@ -133,7 +132,6 @@ class Dino {
       legIncrement: 0,
       currentLeg: 1,
     }
-
     this.blood = {
       x: 10,
       y: 10,
@@ -334,10 +332,12 @@ canvas.addEventListener('click', function(e){
 ////////// Initialize DINO and CACTUS
 var dino = new Dino();
 var cactus1 = new Cactus();
-var cactus2 = new Cactus();
+cactus1.imgObj.onload = function()
+{
+    cactus1.y = 240 - cactus1.imgObj.naturalHeight/2;
+}
 var cactusArray = [];
 cactusArray.push(cactus1);
-cactusArray.push(cactus2);
 
 
 let fps, fpsInterval, startTime, now, then, elapsed;
