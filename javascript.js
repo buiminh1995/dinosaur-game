@@ -53,6 +53,16 @@ dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
 dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
 dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
 
+var pterosaursImg = new Object();
+//Declare new Image objects for pterosaurus
+pterosaursImg.bird1 = new Image();
+pterosaursImg.bird2 = new Image();
+
+//Source for Image objects
+pterosaursImg.bird1.src = './Bird/Bird1.png';
+pterosaursImg.bird2.src = './Bird/Bird2.png';
+
+
 var cactusImg = new Array();
 
 //Declare new Image objects for dino
@@ -152,14 +162,26 @@ class Dino {
       if(this.handleLeg.currentLeg == 1){
         if(keyboard.down == true){
           ctx.drawImage(dinoImg.dinoDuck1, 0, 0, dinoImg.dinoDuck1.naturalWidth, dinoImg.dinoDuck1.naturalHeight, this.x, 240 - dinoImg.dinoDuck1.naturalHeight/2, dinoImg.dinoDuck1.naturalWidth/2, dinoImg.dinoDuck1.naturalHeight/2);
+          this.y = 240 - dinoImg.dinoDuck1.naturalHeight/2;
+          this.width = dinoImg.dinoDuck1.naturalWidth/2;
+          this.height = dinoImg.dinoDuck1.naturalHeight/2;
         } else {
-          ctx.drawImage(dinoImg.dinoRun1, 0, 0, dinoImg.dinoRun1.naturalWidth, dinoImg.dinoRun1.naturalHeight, this.x, this.y, dinoImg.dinoRun1.naturalWidth/2, dinoImg.dinoRun1.naturalHeight/2);
+          ctx.drawImage(dinoImg.dinoRun1, 0, 0, dinoImg.dinoRun1.naturalWidth, dinoImg.dinoRun1.naturalHeight, this.x + 0.5, 240 - dinoImg.dinoRun1.naturalHeight/2, dinoImg.dinoRun1.naturalWidth/2, dinoImg.dinoRun1.naturalHeight/2);
+          this.y = 240 - dinoImg.dinoRun1.naturalHeight/2;
+          this.width = dinoImg.dinoRun1.naturalWidth/2;
+          this.height = dinoImg.dinoRun1.naturalHeight/2;
         }
       } else if(this.handleLeg.currentLeg == 2){
         if(keyboard.down == true){
           ctx.drawImage(dinoImg.dinoDuck2, 0, 0, dinoImg.dinoDuck2.naturalWidth, dinoImg.dinoDuck2.naturalHeight, this.x + 1, 240 - dinoImg.dinoDuck2.naturalHeight/2, dinoImg.dinoDuck2.naturalWidth/2, dinoImg.dinoDuck2.naturalHeight/2);
+          this.y = 240 - dinoImg.dinoDuck1.naturalHeight/2;
+          this.width = dinoImg.dinoDuck1.naturalWidth/2;
+          this.height = dinoImg.dinoDuck1.naturalHeight/2;
         } else {
-          ctx.drawImage(dinoImg.dinoRun2, 0, 0, dinoImg.dinoRun2.naturalWidth, dinoImg.dinoRun2.naturalHeight, this.x, this.y, dinoImg.dinoRun2.naturalWidth/2, dinoImg.dinoRun2.naturalHeight/2);
+          ctx.drawImage(dinoImg.dinoRun2, 0, 0, dinoImg.dinoRun2.naturalWidth, dinoImg.dinoRun2.naturalHeight, this.x, 240 - dinoImg.dinoRun2.naturalHeight/2, dinoImg.dinoRun2.naturalWidth/2, dinoImg.dinoRun2.naturalHeight/2);
+          this.y = 240 - dinoImg.dinoRun2.naturalHeight/2;
+          this.width = dinoImg.dinoRun2.naturalWidth/2;
+          this.height = dinoImg.dinoRun2.naturalHeight/2;
         }
       }
     }
@@ -205,6 +227,55 @@ class Dino {
     }
   }
 }
+
+class Pterosaurs {
+  constructor(){
+    this.x = CANVAS_WIDTH;
+    this.y = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+    this.dx = 0; // delta x
+    this.moveSpeed = -5;
+    this.width = 20;
+    this.height = 60;
+    this.alreadyCollided = false;
+    this.handleWing = {
+      wingIncrement: 0,
+      currentWing: 1,
+    }
+  }
+  draw(){
+      if(this.handleWing.currentWing == 1){
+          this.width = pterosaursImg.bird1.naturalWidth/2;
+          this.height = pterosaursImg.bird1.naturalHeight/2;
+          ctx.drawImage(pterosaursImg.bird1, 0, 0, pterosaursImg.bird1.naturalWidth, pterosaursImg.bird1.naturalHeight, this.x, this.y, pterosaursImg.bird1.naturalWidth/2, pterosaursImg.bird1.naturalHeight/2);
+      } else {
+          this.width = pterosaursImg.bird2.naturalWidth/2;
+          this.height = pterosaursImg.bird2.naturalHeight/2;
+          ctx.drawImage(pterosaursImg.bird2, 0, 0, pterosaursImg.bird2.naturalWidth, pterosaursImg.bird2.naturalHeight, this.x, this.y, pterosaursImg.bird2.naturalWidth/2, pterosaursImg.bird2.naturalHeight/2);
+      }
+    }
+
+  update(){
+    this.dx = this.moveSpeed
+    this.dx *= world.drag; // not necessary
+    this.x += this.dx;
+}
+  handleWingMovement(){
+    if(this.handleWing.currentWing == 1) {
+      this.handleWing.wingIncrement++;
+    }
+    if(this.handleWing.currentWing == 2) {
+      this.handleWing.wingIncrement--;
+    }
+    if(this.handleWing.wingIncrement == 10) {
+      this.handleWing.currentWing = 2;
+      this.handleWing.wingIncrement = 0;
+    }
+    if(this.handleWing.wingIncrement == -10) {
+      this.handleWing.currentWing = 1;
+      this.handleWing.wingIncrement = 0;
+    }
+  }
+}
 //////////
 /////////Cactus class
 class Cactus {
@@ -214,8 +285,8 @@ class Cactus {
     this.y = 240 - this.imgObj.naturalHeight/2;
     this.dx = 0; // delta x
     this.moveSpeed = -5;
-    this.width = 20;
-    this.height = 60;
+    this.width = this.imgObj.naturalWidth/2;
+    this.height = this.imgObj.naturalHeight/2;
     this.alreadyCollided = false;
   }
   draw(){
@@ -287,32 +358,74 @@ function updateCactus_Track_Score_Speed(){
   dinoScoreIncCounter += scoreIncrease;
 }
 
-function generateCactus(){
-  if(cactusArray[0].x < -20){
-    cactusArray.splice(0, 1);
+function generateTrackEnemies(){
+  if(trackEnemiesArray[0].x < -30){
+    trackEnemiesArray.splice(0, 1);
   }
-  if(cactusArray.length == 0){
-    let cactus1 = new Cactus();
-    cactus1.moveSpeed -= cactusSpeedIncrease;
-    cactusArray.push(cactus1);
+  if(dinoScore.score > 100){
+    if(trackEnemiesArray.length == 0){
+      if(Math.floor(Math.random() * 2) == 1){
+        let cactus1 = new Cactus();
+        cactus1.moveSpeed -= cactusSpeedIncrease;
+        trackEnemiesArray.push(cactus1);
+      } else {
+        let peter = new Pterosaurs();
+        peter.moveSpeed -= cactusSpeedIncrease;
+        trackEnemiesArray.push(peter);
+      }
+    }
+    if(trackEnemiesArray[trackEnemiesArray.length - 1].x < CANVAS_WIDTH*60/100){
+        if(Math.floor(Math.random() * 38) == 2){
+          if(Math.floor(Math.random() * 2) == 1){
+            let cactus = new Cactus();
+            cactus.moveSpeed -= cactusSpeedIncrease;
+            trackEnemiesArray.push(cactus);
+          } else {
+            let peter = new Pterosaurs();
+            peter.moveSpeed -= cactusSpeedIncrease;
+            trackEnemiesArray.push(peter);
+          }
+        }
+      }
+} else {
+  if(trackEnemiesArray.length == 0){
+      let cactus1 = new Cactus();
+      cactus1.moveSpeed -= cactusSpeedIncrease;
+      trackEnemiesArray.push(cactus1);
   }
-  if(cactusArray[cactusArray.length - 1].x < CANVAS_WIDTH*60/100){
-      if(Math.floor(Math.random() * 38) == 2){
+  if(trackEnemiesArray[trackEnemiesArray.length - 1].x < CANVAS_WIDTH*60/100){
+    if(Math.floor(Math.random() * 38) == 2){
         let cactus = new Cactus();
         cactus.moveSpeed -= cactusSpeedIncrease;
-        cactusArray.push(cactus);
+        trackEnemiesArray.push(cactus);
     }
   }
+
+}
 }
 
-function handleCollisionCactusDino(){
-  for (var i = 0; i < cactusArray.length; i++) {
-    cactusArray[i].update();
-    cactusArray[i].draw();
-    if(dino.x + dino.width > cactusArray[i].x && dino.y + dino.height > cactusArray[i].y){
-      if(cactusArray[i].alreadyCollided == false){
-        dino.collided = true;
-        cactusArray[i].alreadyCollided = true;
+function handleCollisionOnTrack(){
+  for (var i = 0; i < trackEnemiesArray.length; i++) {
+    if(trackEnemiesArray[i] instanceof Pterosaurs){
+      trackEnemiesArray[i].handleWingMovement();
+    }
+    trackEnemiesArray[i].update();
+    trackEnemiesArray[i].draw();
+    if(dino.x + dino.width > trackEnemiesArray[i].x){
+      if(dino.y <= trackEnemiesArray[i].y){
+        if(dino.y + dino.height > trackEnemiesArray[i].y){
+          if(trackEnemiesArray[i].alreadyCollided == false){
+            dino.collided = true;
+            trackEnemiesArray[i].alreadyCollided = true;
+          }
+        }
+      } else if(dino.y > trackEnemiesArray[i].y){
+        if(dino.y < trackEnemiesArray[i].y + trackEnemiesArray[i].height){
+          if(trackEnemiesArray[i].alreadyCollided == false){
+            dino.collided = true;
+            trackEnemiesArray[i].alreadyCollided = true;
+          }
+        }
       }
     }
   }
@@ -331,10 +444,8 @@ canvas.addEventListener('click', function(e){
     if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
       dino = new Dino();
       cactus1 = new Cactus();
-      cactus2 = new Cactus();
-      cactusArray = [];
-      cactusArray.push(cactus1);
-      cactusArray.push(cactus2);
+      trackEnemiesArray = [];
+      trackEnemiesArray.push(cactus1);
       showI = true;
       gameOver = false;
       cactusSpeedIncrease = 0;
@@ -357,8 +468,8 @@ cactus1.imgObj.onload = function()
 {
     cactus1.y = 240 - cactus1.imgObj.naturalHeight/2;
 }
-var cactusArray = [];
-cactusArray.push(cactus1);
+var trackEnemiesArray = [];
+trackEnemiesArray.push(cactus1);
 
 
 let fps, fpsInterval, startTime, now, then, elapsed;
@@ -391,8 +502,8 @@ function animate(){
       dino.update();
       dino.draw();
       drawStaticStuff();
-      generateCactus();
-      handleCollisionCactusDino();
+      generateTrackEnemies();
+      handleCollisionOnTrack();
     }
   }
   requestAnimationFrame(animate);
