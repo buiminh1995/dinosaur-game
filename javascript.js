@@ -8,6 +8,13 @@ CANVAS_HEIGHT = canvas.height = 253;
 const FONT_NAME = 'Press Start 2P';
 document.fonts.load('10px "Press Start 2P"').then(startGame);
 
+//template contains audio
+var template = document.querySelector('#audio-resources');
+
+// Clone above template
+var all_audio = template.content.cloneNode(true);
+// for()
+
 // if true show instructions
 var showI = true;
 
@@ -16,8 +23,8 @@ var gameOver = false;
 
 //cactus increase moveSpeed
 var cactusSpeedIncrease = 0;
-var scoreIncrease = 0.2;
-var dinoScoreIncCounter = 0; //if reach 500 cactus and score's speed increases
+var scoreIncrease = 0.2; //0.2
+var dinoScoreIncCounter = 0; //if reach 100, cactus' and score's speed increases
 
 //game over and reset image
 const gameOverImg = new Image();
@@ -33,8 +40,9 @@ trackImg2.src = './Other/Track.png';
 // this is to make track run with cactus
 let x1TrackImg = 0;
 let x2TrackImg = 2404;
-let trackSpeed = 5;
+let trackSpeed = 5; //equal to moveSpeed variable of Cactus()
 
+//IMAGES FOR DINO ACTIONS
 var dinoImg = new Object();
 //Declare new Image objects for dino
 dinoImg.dinoDead = new Image();
@@ -44,7 +52,6 @@ dinoImg.dinoJump = new Image();
 dinoImg.dinoRun1 = new Image();
 dinoImg.dinoRun2 = new Image();
 dinoImg.dinoStart = new Image();
-
 //Source for Image objects
 dinoImg.dinoDead.src = './Dino/DinoDead.png';
 dinoImg.dinoDuck1.src = './Dino/DinoDuck1.png';
@@ -53,18 +60,17 @@ dinoImg.dinoJump.src = dinoImg.dinoStart.src = './Dino/DinoJump.png';
 dinoImg.dinoRun1.src = './Dino/DinoRun1.png';
 dinoImg.dinoRun2.src = './Dino/DinoRun2.png';
 
+//IMAGES FOR PTEROSAURS
 var pterosaursImg = new Object();
 //Declare new Image objects for pterosaurus
 pterosaursImg.bird1 = new Image();
 pterosaursImg.bird2 = new Image();
-
 //Source for Image objects
 pterosaursImg.bird1.src = './Bird/Bird1.png';
 pterosaursImg.bird2.src = './Bird/Bird2.png';
 
-
+//IMAGES FOR CACTUS
 var cactusImg = new Array();
-
 //Declare new Image objects for dino
 cactusImg[0] = new Image();
 cactusImg[1] = new Image();
@@ -72,7 +78,6 @@ cactusImg[2] = new Image();
 cactusImg[3] = new Image();
 cactusImg[4] = new Image();
 cactusImg[5] = new Image();
-
 //Source for Image objects
 cactusImg[0].src = './Cactus/LargeCactus1.png'
 cactusImg[1].src = './Cactus/LargeCactus2.png'
@@ -115,14 +120,14 @@ const keyboard = (() => {
 
 // define WORLD
 const world = {
-  gravity: 0.3, // strength per frame of gravity //prev 0.2
+  gravity: 0.3, // strength per frame of gravity //prev 0.3  0.2
   drag: 0.999, // play with this value to change drag
   groundDrag: 0.9, // play with this value to change ground movement
   ground: 240,
 }
 
 var dinoScore = {
-  x: 520,
+  x: 540, //520
   y: 20,
   score: 0,
   hiScore: 0,
@@ -133,13 +138,14 @@ class Dino {
   constructor(){
     this.x = 10 ;
     this.y = 193;
+    this.prevY = 193;
     this.dx = 0; // delta x and y
     this.dy = 0;
     this.width = 44;
     this.height = 47;
     this.onGround = false;
-    this.jumpPower = -8;  // power of jump smaller jumps higher eg -10 smaller than -5
-    this.moveSpeed = 2;
+    this.jumpPower = -7.5;  // power of jump smaller jumps higher eg -10 smaller than -5
+    //this.fallSpeed = 5;
     this.collided = false;
     this.state = "start";
     this.handleLeg = {
@@ -152,8 +158,8 @@ class Dino {
       Width: 50,
       Height: 10,
     }
-
   }
+
   draw(){
     if(this.state == "start" || !this.onGround){
       ctx.drawImage(dinoImg.dinoStart, 0, 0, 88, 94, this.x, this.y, 44, 47);
@@ -161,47 +167,69 @@ class Dino {
     if(this.onGround){
       if(this.handleLeg.currentLeg == 1){
         if(keyboard.down == true){
-          ctx.drawImage(dinoImg.dinoDuck1, 0, 0, dinoImg.dinoDuck1.naturalWidth, dinoImg.dinoDuck1.naturalHeight, this.x, 240 - dinoImg.dinoDuck1.naturalHeight/2, dinoImg.dinoDuck1.naturalWidth/2, dinoImg.dinoDuck1.naturalHeight/2);
           this.y = 240 - dinoImg.dinoDuck1.naturalHeight/2;
           this.width = dinoImg.dinoDuck1.naturalWidth/2;
           this.height = dinoImg.dinoDuck1.naturalHeight/2;
+          ctx.drawImage(dinoImg.dinoDuck1, 0, 0, dinoImg.dinoDuck1.naturalWidth, dinoImg.dinoDuck1.naturalHeight, this.x, 240 - dinoImg.dinoDuck1.naturalHeight/2, dinoImg.dinoDuck1.naturalWidth/2, dinoImg.dinoDuck1.naturalHeight/2);
         } else {
-          ctx.drawImage(dinoImg.dinoRun1, 0, 0, dinoImg.dinoRun1.naturalWidth, dinoImg.dinoRun1.naturalHeight, this.x + 0.5, 240 - dinoImg.dinoRun1.naturalHeight/2, dinoImg.dinoRun1.naturalWidth/2, dinoImg.dinoRun1.naturalHeight/2);
           this.y = 240 - dinoImg.dinoRun1.naturalHeight/2;
           this.width = dinoImg.dinoRun1.naturalWidth/2;
           this.height = dinoImg.dinoRun1.naturalHeight/2;
+          ctx.drawImage(dinoImg.dinoRun1, 0, 0, dinoImg.dinoRun1.naturalWidth, dinoImg.dinoRun1.naturalHeight, this.x + 0.24, 240 - dinoImg.dinoRun1.naturalHeight/2, dinoImg.dinoRun1.naturalWidth/2, dinoImg.dinoRun1.naturalHeight/2);
         }
       } else if(this.handleLeg.currentLeg == 2){
         if(keyboard.down == true){
+          this.y = 240 - dinoImg.dinoDuck2.naturalHeight/2;
+          this.width = dinoImg.dinoDuck2.naturalWidth/2;
+          this.height = dinoImg.dinoDuck2.naturalHeight/2;
           ctx.drawImage(dinoImg.dinoDuck2, 0, 0, dinoImg.dinoDuck2.naturalWidth, dinoImg.dinoDuck2.naturalHeight, this.x + 1, 240 - dinoImg.dinoDuck2.naturalHeight/2, dinoImg.dinoDuck2.naturalWidth/2, dinoImg.dinoDuck2.naturalHeight/2);
-          this.y = 240 - dinoImg.dinoDuck1.naturalHeight/2;
-          this.width = dinoImg.dinoDuck1.naturalWidth/2;
-          this.height = dinoImg.dinoDuck1.naturalHeight/2;
         } else {
-          ctx.drawImage(dinoImg.dinoRun2, 0, 0, dinoImg.dinoRun2.naturalWidth, dinoImg.dinoRun2.naturalHeight, this.x, 240 - dinoImg.dinoRun2.naturalHeight/2, dinoImg.dinoRun2.naturalWidth/2, dinoImg.dinoRun2.naturalHeight/2);
           this.y = 240 - dinoImg.dinoRun2.naturalHeight/2;
           this.width = dinoImg.dinoRun2.naturalWidth/2;
           this.height = dinoImg.dinoRun2.naturalHeight/2;
+          ctx.drawImage(dinoImg.dinoRun2, 0, 0, dinoImg.dinoRun2.naturalWidth, dinoImg.dinoRun2.naturalHeight, this.x, 240 - dinoImg.dinoRun2.naturalHeight/2, dinoImg.dinoRun2.naturalWidth/2, dinoImg.dinoRun2.naturalHeight/2);
         }
       }
     }
+    //draw blood of dino
     ctx.beginPath();
     ctx.fillStyle = "#535353";
     ctx.rect(this.blood.x, this.blood.y , this.blood.Width, this.blood.Height);
     ctx.fill();
   }
+
   update(){
-    if ((keyboard.space || keyboard.up) && this.onGround) { this.dy = this.jumpPower }
+    this.prevY = this.y;
+    if ((keyboard.space || keyboard.up) && this.onGround) {
+      this.dy = this.jumpPower;
+      let src = all_audio.getElementById('offline-sound-press').src;
+      let audio = new Audio();
+      audio.src = src;
+      audio.play();
+    }
+    //Deal with dino blood
     if(this.collided){
       this.blood.Width -= 2;
       this.collided = false;
+
       if(this.blood.Width == 0){
         gameOver = true;
       }
+
     }
+    //
+    if(keyboard.down){
+      this.dy += 3;
+    }
+    //effects of gravity
     this.dy += world.gravity;
-    // this.dy *= world.drag;
+    //
     this.y += this.dy
+    //if dino is falling then increase speed of falling
+    if(this.prevY < this.y){
+      this.dy += 0.5;
+    }
+    //
     if (this.y + this.height >= world.ground) {
       this.y = world.ground - this.height;
       this.dy = 0;
@@ -209,7 +237,9 @@ class Dino {
     } else {
       this.onGround = false;
     }
+    //console.log(this.prevY,this.y);
 }
+
   handleLegMovement(){
     if(this.handleLeg.currentLeg == 1) {
       this.handleLeg.legIncrement++;
@@ -242,6 +272,7 @@ class Pterosaurs {
       currentWing: 1,
     }
   }
+
   draw(){
       if(this.handleWing.currentWing == 1){
           this.width = pterosaursImg.bird1.naturalWidth/2;
@@ -259,6 +290,7 @@ class Pterosaurs {
     this.dx *= world.drag; // not necessary
     this.x += this.dx;
 }
+
   handleWingMovement(){
     if(this.handleWing.currentWing == 1) {
       this.handleWing.wingIncrement++;
@@ -284,14 +316,16 @@ class Cactus {
     this.x = CANVAS_WIDTH ;
     this.y = 240 - this.imgObj.naturalHeight/2;
     this.dx = 0; // delta x
-    this.moveSpeed = -5;
+    this.moveSpeed = -5; //-5
     this.width = this.imgObj.naturalWidth/2;
     this.height = this.imgObj.naturalHeight/2;
     this.alreadyCollided = false;
   }
+
   draw(){
     ctx.drawImage(this.imgObj, 0, 0, this.imgObj.naturalWidth, this.imgObj.naturalHeight, this.x, this.y, this.imgObj.naturalWidth/2, this.imgObj.naturalHeight/2);
   }
+
   update(){
     this.dx = this.moveSpeed
     this.dx *= world.drag;
@@ -299,7 +333,25 @@ class Cactus {
   }
 }
 
+class Cloud {
+  constructor(){
+    this.imgObj = new Image();
+    this.imgObj.src = './Other/Cloud.png'
+    this.x = CANVAS_WIDTH ;
+    this.y = Math.floor(Math.random()*(100 - 5 + 1)) + 5;
+  }
+  draw(){
+    ctx.drawImage(this.imgObj, 0, 0, this.imgObj.naturalWidth, this.imgObj.naturalHeight, this.x, this.y, this.imgObj.naturalWidth/2, this.imgObj.naturalHeight/2);
+  }
 
+  update(){
+    this.x -= 2;
+  }
+}
+
+/////END OF ALL CLASSES
+
+//FUNCTIONS FOR GAME MECHANICS
 async function startGame(){
   ctx.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT); // clear the 'Click SPACE to start' line with the annoying default font
   if(keyboard.space || keyboard.up){ // don't understand this line
@@ -323,6 +375,7 @@ function gameOverMsg(){
   ctx.drawImage(reset, 262, 100, 75, 101);
 }
 
+///FUNCTIONS FOR DRAWING STUFF ON SCREEN
 function drawTrack(){
   ctx.drawImage(trackImg1,x1TrackImg, 220);
   ctx.drawImage(trackImg2,x2TrackImg, 220);
@@ -332,24 +385,47 @@ function drawTrack(){
   else{x2TrackImg -= trackSpeed;}
 }
 
- function printScore(){
+function drawClouds(){
+  for(let i = 0; i < cloudArr.length; i++){
+    cloudArr[i].update();
+    cloudArr[i].draw();
+  }
+}
+
+function drawStaticStuff(){
+  // draw border of blood
+  ctx.beginPath();
+  ctx.fillStyle = "#000000";
+  ctx.rect(10, 10 , 50, 10.8); //10 10 50 10.5
+  ctx.stroke();
+  //
+}
+
+function printScore(){
    if(window.localStorage.getItem('highScore') === null || parseInt(window.localStorage.getItem('highScore')) < dinoScore.score){
          window.localStorage.setItem('highScore', `${Math.floor(dinoScore.score)}`);
    }
+   //dino score
    ctx.font = `15px '${FONT_NAME}'`;
    ctx.fillStyle = "#535353";
    ctx.fillText(`${Math.floor(dinoScore.score)}`, dinoScore.x, dinoScore.y);
-   let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
+   ////
+
+   //high score
+   let lenScore = Math.floor(dinoScore.score).toString().length;
+   //let lenHiScore = window.localStorage.getItem('highScore').length ? window.localStorage.getItem('highScore').length : 1;
    ctx.fillStyle = "#747474";
-   ctx.fillText(window.localStorage.getItem('highScore'), dinoScore.x - (47 + 5*lenHiScore), dinoScore.y);
-   ctx.fillText(`HI`, dinoScore.x - (100 + 5*lenHiScore) - 5, dinoScore.y);
+   ctx.fillText(`HI` + " " + window.localStorage.getItem('highScore'), dinoScore.x - (90 + 7.5*lenScore), dinoScore.y);
+   // ctx.fillText(`HI`, dinoScore.x - (110 + 5*lenHiScore), dinoScore.y);
+   //
 }
+///END 'FUNCTIONS FOR DRAWING STUFF ON SCREEN'
 
 function updateCactus_Track_Score_Speed(){
-  if(dinoScoreIncCounter > 500 && cactusSpeedIncrease < 5){ // cần test lại
-    cactusSpeedIncrease += 0.25; //0.2
-    trackSpeed += 0.25; //0.2
-    scoreIncrease += 0.15; //0.1
+  if(dinoScoreIncCounter > 100 && cactusSpeedIncrease < 5){ // cần test lại
+    cactusSpeedIncrease += 0.5; //0.4
+    trackSpeed += 0.5; //0.4
+    scoreIncrease += 0.16; //0.1
     dinoScoreIncCounter = 0;
     // console.log(dinoScoreIncCounter,cactusSpeedIncrease,scoreIncrease);
   }
@@ -358,12 +434,30 @@ function updateCactus_Track_Score_Speed(){
   dinoScoreIncCounter += scoreIncrease;
 }
 
+//GENERATE CLOUDS AND ENEMIES ON TRACK
+function generateClouds(){
+  if(cloudArr[0].x < -40){
+    cloudArr.splice(0, 1);
+  }
+  //if there is no cloud in cloud array, add new one to the array
+  if(cloudArr.length == 0){
+    cloudArr[0] = new Cloud();
+  }
+  //when the last enemy in array is at 50% or less of the screen, consider adding another cloud
+  if(cloudArr[cloudArr.length - 1].x < CANVAS_WIDTH*50/100){
+    let new_cloud = new Cloud();
+    cloudArr.push(new_cloud);
+  }
+}
+
 function generateTrackEnemies(){
+  //if enemy leaves the screen, delete it from enemy array
   if(trackEnemiesArray[0].x < -30){
     trackEnemiesArray.splice(0, 1);
   }
-  if(dinoScore.score > 100){
-    if(trackEnemiesArray.length == 0){
+  //if there is no enemy in enemy array, add new one to the array
+  if(trackEnemiesArray.length == 0){
+    if(dinoScore.score > 100){
       if(Math.floor(Math.random() * 2) == 1){
         let cactus1 = new Cactus();
         cactus1.moveSpeed -= cactusSpeedIncrease;
@@ -373,9 +467,16 @@ function generateTrackEnemies(){
         peter.moveSpeed -= cactusSpeedIncrease;
         trackEnemiesArray.push(peter);
       }
+    } else{
+      let cactus1 = new Cactus();
+      cactus1.moveSpeed -= cactusSpeedIncrease;
+      trackEnemiesArray.push(cactus1);
     }
-    if(trackEnemiesArray[trackEnemiesArray.length - 1].x < CANVAS_WIDTH*60/100){
-        if(Math.floor(Math.random() * 38) == 2){
+  }
+  //when the last enemy in array is at 60% or less of the screen, consider adding another enemy
+  if(trackEnemiesArray[trackEnemiesArray.length - 1].x < CANVAS_WIDTH*40/100){
+      if(Math.floor(Math.random() * 38) == 2){
+        if(dinoScore.score > 100){
           if(Math.floor(Math.random() * 2) == 1){
             let cactus = new Cactus();
             cactus.moveSpeed -= cactusSpeedIncrease;
@@ -385,25 +486,17 @@ function generateTrackEnemies(){
             peter.moveSpeed -= cactusSpeedIncrease;
             trackEnemiesArray.push(peter);
           }
+        } else{
+          let cactus = new Cactus();
+          cactus.moveSpeed -= cactusSpeedIncrease;
+          trackEnemiesArray.push(cactus);
         }
       }
-} else {
-  if(trackEnemiesArray.length == 0){
-      let cactus1 = new Cactus();
-      cactus1.moveSpeed -= cactusSpeedIncrease;
-      trackEnemiesArray.push(cactus1);
-  }
-  if(trackEnemiesArray[trackEnemiesArray.length - 1].x < CANVAS_WIDTH*60/100){
-    if(Math.floor(Math.random() * 38) == 2){
-        let cactus = new Cactus();
-        cactus.moveSpeed -= cactusSpeedIncrease;
-        trackEnemiesArray.push(cactus);
     }
   }
+// END 'GENERATE CLOUDS AND ENEMIES ON TRACK'
 
-}
-}
-
+//HANDLE COLLISION
 function handleCollisionOnTrack(){
   for (var i = 0; i < trackEnemiesArray.length; i++) {
     if(trackEnemiesArray[i] instanceof Pterosaurs){
@@ -431,14 +524,7 @@ function handleCollisionOnTrack(){
   }
 }
 
-function drawStaticStuff(){
-  ctx.beginPath();
-  ctx.fillStyle = "#000000";
-  ctx.rect(10, 10 , 50, 10.8); //10 10 50 10.5
-  ctx.stroke();
-}
-
-// for reset button
+// WHEN PRESSED RESET BUTTON TO PLAY AGAIN
 canvas.addEventListener('click', function(e){
   if(gameOver){
     if(e.offsetX >= 262 && e.offsetX <= 337 && e.offsetY >= 100 && e.offsetY <= 201){
@@ -451,7 +537,7 @@ canvas.addEventListener('click', function(e){
       cactusSpeedIncrease = 0;
       scoreIncrease = 0.2;
       dinoScoreIncCounter = 0;
-      trackSpeed = 5;
+      trackSpeed = 5; //equal to moveSpeed of cactus
       dinoScore.x = 520,
       dinoScore.y = 20,
       dinoScore.score =  0,
@@ -461,7 +547,13 @@ canvas.addEventListener('click', function(e){
   }
 })
 
-////////// Initialize DINO and CACTUS
+////////// Initialize DINO and CACTUS and CLOUDS
+//Clouds
+var cloudArr = new Array();
+let new_cloud = new Cloud();
+cloudArr.push(new_cloud);
+
+//Dino
 var dino = new Dino();
 var cactus1 = new Cactus();
 cactus1.imgObj.onload = function()
@@ -471,7 +563,7 @@ cactus1.imgObj.onload = function()
 var trackEnemiesArray = [];
 trackEnemiesArray.push(cactus1);
 
-
+//fps-related variables
 let fps, fpsInterval, startTime, now, then, elapsed;
 
 function startAnimating(fps){
@@ -504,9 +596,11 @@ function animate(){
       drawStaticStuff();
       generateTrackEnemies();
       handleCollisionOnTrack();
+      generateClouds();
+      drawClouds();
     }
   }
   requestAnimationFrame(animate);
 }
 //animate();
-startAnimating(50);
+startAnimating(60); //50
